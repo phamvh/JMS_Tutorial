@@ -1,0 +1,34 @@
+This project runs on WildFly 9 (aka JBoss).
+
+Instruction to set up WildFly:
+
+1. Download WildFly 9 (Instructions may be different for other versions, older or newer).
+2. Open file wildfly-9.0.2.Final/standalone/configuration/standalone-full.xml and modify it as follow:
+
+2.1 Look for the xml tag <hornetQ-server>
+2.2 Inside this one, you can add any queue or topic as you want. There are already some sample queue and topic in there.
+   You can add a new one to the <jms-destinations>, like this:
+      <jms-topic name="test1Topic">
+            <entry name="topic/test1"/>
+            <entry name="java:jboss/exported/jms/topic/test1"/>
+      </jms-topic>
+      
+2.3 (This is found by pandush, not sure whether this is necessary or not, but he had to do it to make it work.)
+  Comment out the <security-settings> tag, and next to it, add <security-enabled>false<security-enabled>, like below:
+  
+     <security-enabled>false</security-enabled>
+     <!--security-settings>
+                    <security-setting match="#">
+                        <permission type="send" roles="guest"/>
+                        <permission type="consume" roles="guest"/>
+                        <permission type="createNonDurableQueue" roles="guest"/>
+                        <permission type="deleteNonDurableQueue" roles="guest"/>
+                    </security-setting>
+     </security-settings-->  
+ To me, it seems like if you add a user and password with correct rights, then you won't need to comment out this security settings. 
+ 
+ 2.4 Make sure to start the wildfly with the option that indicates the standalone-full.xml file. There are two ways, from command line or in eclipse:
+    - From command line, enter: ./standalone.sh --server-config=standalone-full.xml
+    - If you start WildFly inside Eclipse, Eclipse has an option to provide the configuration file during the set-up of the server. Make sure to specify it.   
+ 2.5 That's it for the setup. For the project, make sure to enter the correct info for the queue or topic in the jndi.properties file. This info is taken from the standalone-full.xml.
+   Note that if you don't want to create this file, you can just create a Properties instance inside your code, and pass it to the constructor of InitialContext.    
